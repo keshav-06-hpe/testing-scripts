@@ -1,12 +1,14 @@
 #!/bin/bash
 
-# List of namespaces
-namespaces=(argo dvs hnc-system nexus pki-operator services slurm-operator spire tapms-operator uas vault)
+# Retrieve namespaces with istio-injection=enabled label
+namespaces=$(kubectl get ns -l istio-injection=enabled -o jsonpath='{.items[*].metadata.name}')
 
-# Loop through each namespace and perform a rollout restart for all deployments
-for namespace in "${namespaces[@]}"; do
-  echo "\n\n**** Performing rollout restart for namespace: $namespace ****"
-  kubectl rollout restart all -n $namespace
+# Perform rollout restart for deployments and statefulsets in each namespace
+for namespace in $namespaces; do
+  echo "**** Performing rollout restart for namespace: $namespace ****"
+  kubectl rollout restart deployment -n $namespace
+  kubectl rollout restart statefulset -n $namespace
+  kubectl rollout restart daemonset -n $namespace
 done
 
 echo "Rollout restart completed for all istio-injection enabled namespaces."
