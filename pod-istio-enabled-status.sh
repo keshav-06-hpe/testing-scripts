@@ -27,7 +27,7 @@
 #!/bin/bash
 
 # Define a list of namespaces (change or add as needed)
-namespaces=(argo dvs hnc-system nexus pki-operator services slurm-operator spire tapms-operator uas vault)
+namespaces=$(kubectl get namespaces -l istio-injection=enabled -o jsonpath="{.items[*].metadata.name}")
 
 # Array to hold pods with Istio image version v1.11.8
 pods_with_old_version=()
